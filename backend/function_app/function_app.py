@@ -9,7 +9,7 @@ from helpers.analysis_core import (
     clean_data,
     avg_macros_by_diet,
     top_5_protein_by_diet,
-    cuisine_counts_by_diet,
+    cuisine_counts,
 )
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
@@ -80,7 +80,7 @@ def diet_dashboard(req: func.HttpRequest) -> func.HttpResponse:
         # Calculate analytics
         avg_macros_df = avg_macros_by_diet(df)
         top_protein_df = top_5_protein_by_diet(df)
-        cuisine_df = cuisine_counts_by_diet(df)
+        cuisine_df = cuisine_counts(df)
 
         # Format response
         execution_time_ms = round((time.time() - start_time) * 1000, 2)

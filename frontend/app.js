@@ -149,7 +149,7 @@ function filterData() {
       x => x.Diet_type === selectedDiet
     ),
 
-    cuisine_counts: globalData.cuisine_counts, // do NOT filter
+    cuisine_counts: globalData.cuisine_counts,
 
     execution_time_ms: globalData.execution_time_ms
   };
