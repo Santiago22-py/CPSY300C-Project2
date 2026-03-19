@@ -52,7 +52,7 @@ def _format_cuisine_counts(cuisine_df: pd.DataFrame) -> list:
     return cuisine_df.to_dict(orient="records")
 
 
-@app.route(route="api/diet-dashboard", methods=["GET"])
+@app.route(route="diet-dashboard", methods=["GET"])
 def diet_dashboard(req: func.HttpRequest) -> func.HttpResponse:
     """
     Analyze diet data from Azure Blob Storage.
