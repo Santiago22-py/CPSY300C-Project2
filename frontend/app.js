@@ -141,10 +141,17 @@ function filterData() {
   }
 
   const filtered = {
-    ...globalData,
     avg_macros: globalData.avg_macros.filter(
       x => x.Diet_type === selectedDiet
-    )
+    ),
+
+    top_protein: globalData.top_protein.filter(
+      x => x.Diet_type === selectedDiet
+    ),
+
+    cuisine_counts: globalData.cuisine_counts, // do NOT filter
+
+    execution_time_ms: globalData.execution_time_ms
   };
 
   renderCharts(filtered);
