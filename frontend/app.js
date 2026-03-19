@@ -1,4 +1,4 @@
-const API_URL = "https://diet-dashboard-function.azurewebsites.net/api/diet-dashboard";
+const API_URL = "https://diets-app.azurewebsites.net/api/diet-dashboard";
 
 document.getElementById("refreshBtn").addEventListener("click", loadData);
 document.getElementById("dietFilter").addEventListener("change", filterData);
