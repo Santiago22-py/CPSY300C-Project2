@@ -15,14 +15,27 @@ async function loadData() {
     renderCharts(data);
   } catch (error) {
     console.error("Error loading data:", error);
+    document.getElementById("meta").textContent = "Failed to load data";
   }
 }
 
 function renderCharts(data) {
-  const labels = data.avg_macros?.map(x => x.Diet_type) || [];
-  const protein = data.avg_macros?.map(x => x.Protein) || [];
-  const carbs = data.avg_macros?.map(x => x.Carbs) || [];
-  const fat = data.avg_macros?.map(x => x.Fat) || [];
+  const avgMacros = data.avg_macros || [];
+  const topProtein = data.top_protein || [];
+  const cuisineCounts = data.cuisine_counts || [];
+
+  const dietLabels = avgMacros.map(x => x.Diet_type);
+  const proteinData = avgMacros.map(x => x.Protein);
+  const carbsData = avgMacros.map(x => x.Carbs);
+  const fatData = avgMacros.map(x => x.Fat);
+
+  const cuisineLabels = cuisineCounts.map(x => x.Cuisine);
+  const cuisineData = cuisineCounts.map(x => x.Count);
+
+  const topProteinLabels = topProtein.map(
+    x => `${x.Recipe_name.length > 20 ? x.Recipe_name.slice(0, 20) + "..." : x.Recipe_name}`
+  );
+  const topProteinValues = topProtein.map(x => x.Protein);
 
   if (barChart) barChart.destroy();
   if (pieChart) pieChart.destroy();
@@ -31,32 +44,69 @@ function renderCharts(data) {
   barChart = new Chart(document.getElementById("barChart"), {
     type: "bar",
     data: {
-      labels,
+      labels: dietLabels,
       datasets: [
-        { label: "Protein", data: protein },
-        { label: "Carbs", data: carbs },
-        { label: "Fat", data: fat }
+        { label: "Protein", data: proteinData },
+        { label: "Carbs", data: carbsData },
+        { label: "Fat", data: fatData }
       ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: "Average Macronutrients by Diet Type"
+        }
+      }
     }
   });
 
   pieChart = new Chart(document.getElementById("pieChart"), {
     type: "pie",
     data: {
-      labels,
+      labels: cuisineLabels,
       datasets: [
-        { label: "Protein", data: protein }
+        {
+          label: "Cuisine Distribution",
+          data: cuisineData
+        }
       ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: "Cuisine Distribution"
+        }
+      }
     }
   });
 
   lineChart = new Chart(document.getElementById("lineChart"), {
     type: "line",
     data: {
-      labels,
+      labels: topProteinLabels,
       datasets: [
-        { label: "Protein", data: protein }
+        {
+          label: "Top Protein Recipes",
+          data: topProteinValues,
+          fill: false,
+          tension: 0.2
+        }
       ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: "Top Protein-Rich Recipes"
+        }
+      }
     }
   });
 }
+
+loadData();
