@@ -66,14 +66,14 @@ def diet_dashboard(req: func.HttpRequest) -> func.HttpResponse:
         }
 
         return func.HttpResponse(
-            json.dumps(response_data),
+            json.dumps(response_data, indent=2),
             mimetype="application/json",
             status_code=200
         )
 
     except Exception as e:
         return func.HttpResponse(
-            json.dumps({"error": str(e)}),
+            json.dumps({"error": str(e)}, indent=2),
             mimetype="application/json",
             status_code=500
         )
