@@ -100,21 +100,15 @@ def diet_with_most_protein(data: pd.DataFrame) -> tuple:
     return top_diet, round(avg_protein[top_diet], 2)
 
 
-def most_common_cuisine_by_diet(data: pd.DataFrame) -> pd.DataFrame:
-    """
-    Identify the most common cuisine type for each diet type.
+    def cuisine_counts_by_diet(data: pd.DataFrame) -> pd.DataFrame:
+        """
+        Count cuisine occurrences for each diet type.
+        Returns:
+            Diet_type | Cuisine | Count
+        """
+        return (
+            data.groupby(["Diet_type", "Cuisine"])
+            .size()
+            .reset_index(name="Count")
+        )
     
-    Args:
-        data (pd.DataFrame): Input dataset with columns: Diet_type, Cuisine.
-    
-    Returns:
-        pd.DataFrame: Most common cuisine per diet type with columns:
-                     [Diet_type, Cuisine]
-    """
-    common_cuisine = (
-        data.groupby("Diet_type")["Cuisine"]
-        .agg(lambda x: x.mode()[0] if not x.mode().empty else "Unknown")
-        .reset_index()
-    )
-    common_cuisine.columns = ["Diet_type", "Cuisine"]
-    return common_cuisine

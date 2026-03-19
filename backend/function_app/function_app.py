@@ -9,7 +9,7 @@ from helpers.analysis_core import (
     clean_data,
     avg_macros_by_diet,
     top_5_protein_by_diet,
-    most_common_cuisine_by_diet,
+    cuisine_counts_by_diet,
 )
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
@@ -47,8 +47,7 @@ def _format_top_protein(top_protein_df: pd.DataFrame) -> list:
 
 
 def _format_cuisine_counts(cuisine_df: pd.DataFrame) -> list:
-    """Convert most common cuisine per diet type to list of dicts."""
-    cuisine_df.columns = ["Diet_type", "Cuisine"]
+    """Convert cuisine counts to list of dicts."""
     return cuisine_df.to_dict(orient="records")
 
 
@@ -81,7 +80,7 @@ def diet_dashboard(req: func.HttpRequest) -> func.HttpResponse:
         # Calculate analytics
         avg_macros_df = avg_macros_by_diet(df)
         top_protein_df = top_5_protein_by_diet(df)
-        cuisine_df = most_common_cuisine_by_diet(df)
+        cuisine_df = cuisine_counts_by_diet(df)
 
         # Format response
         execution_time_ms = round((time.time() - start_time) * 1000, 2)
