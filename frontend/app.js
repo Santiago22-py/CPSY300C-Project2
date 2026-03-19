@@ -1,13 +1,18 @@
-const API_URL = "https://diets-app.azurewebsites.net/api/diet-dashboard";
+const API_URL = "https://diet-dashboard-function.azurewebsites.net/api/diet-dashboard";
 
 document.getElementById("refreshBtn").addEventListener("click", loadData);
+document.getElementById("dietFilter").addEventListener("change", filterData);
 
 let barChart, pieChart, lineChart;
+let globalData = null;
 
 async function loadData() {
   try {
     const response = await fetch(API_URL);
     const data = await response.json();
+
+    globalData = data;
+    populateFilter(data);
 
     document.getElementById("meta").textContent =
       `Execution time: ${data.execution_time_ms ?? "--"} ms`;
@@ -107,6 +112,42 @@ function renderCharts(data) {
       }
     }
   });
+}
+
+function populateFilter(data) {
+
+  const filter = document.getElementById("dietFilter");
+  filter.innerHTML = '<option value="all">All Diet Types</option>';
+
+  const avgMacros = data.avg_macros || [];
+
+  avgMacros.forEach(diet => {
+    const option = document.createElement("option");
+    option.value = diet.Diet_type;
+    option.textContent = diet.Diet_type;
+    filter.appendChild(option);
+  });
+}
+
+function filterData() {
+
+  const selectedDiet = document.getElementById("dietFilter").value;
+
+  if (!globalData) return;
+
+  if (selectedDiet === "all") {
+    renderCharts(globalData);
+    return;
+  }
+
+  const filtered = {
+    ...globalData,
+    avg_macros: globalData.avg_macros.filter(
+      x => x.Diet_type === selectedDiet
+    )
+  };
+
+  renderCharts(filtered);
 }
 
 loadData();
