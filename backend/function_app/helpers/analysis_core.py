@@ -1,53 +1,120 @@
+"""
+Data analysis module for diet dashboard analytics.
+
+Provides reusable functions for processing and analyzing dietary data,
+including macronutrient calculations and cuisine/protein analysis.
+"""
+
 import pandas as pd
 
 
-# Loading data from a CSV file
-def load_data(file_path):
-    """Load data from a CSV file."""
-    try:
-        data = pd.read_csv(file_path)
-        print(f"Data loaded successfully from {file_path}")
-
-        # Renaming columns for easier access (Code was buggy at first without this)
-        rename_columns = {
-            "Protein(g)": "Protein",
-            "Carbs(g)": "Carbs",
-            "Fat(g)": "Fat",
-            "Cuisine_type": "Cuisine",
-        }
-        data = data.rename(columns=rename_columns)
-        return data
-    except Exception as e:
-        print(f"Error loading data: {e}")
-        return None
-
-# Cleaning the data by removing rows with missing values in key columns
-def clean_data(data):
-    """Remove rows with missing macro values."""
-    data = data.dropna(subset=["Protein", "Carbs", "Fat", "Diet_type"])
+def load_data(file_path: str) -> pd.DataFrame:
+    """
+    Load diet data from a local CSV file.
+    
+    Args:
+        file_path (str): Path to the CSV file.
+    
+    Returns:
+        pd.DataFrame: Dataset with renamed columns (Protein, Carbs, Fat, Cuisine).
+        
+    Raises:
+        FileNotFoundError: If file path does not exist.
+        pd.errors.ParserError: If file cannot be parsed as CSV.
+    """
+    data = pd.read_csv(file_path)
+    
+    # Rename columns for consistent access across functions
+    rename_columns = {
+        "Protein(g)": "Protein",
+        "Carbs(g)": "Carbs",
+        "Fat(g)": "Fat",
+        "Cuisine_type": "Cuisine",
+    }
+    data = data.rename(columns=rename_columns)
     return data
 
-# Calculating average macros by diet type
-def avg_macros_by_diet(data):
-    """Calculate average macros by diet type."""
-    avg_macros = data.groupby("Diet_type")[["Protein", "Carbs", "Fat"]].mean().reset_index()
-    return avg_macros
 
-# Getting top 5 foods by protein content for each diet type
-def top_5_protein_by_diet(data):
-    """Get top 5 foods by protein content for each diet type."""
-    top_protein = data.sort_values(by="Protein", ascending=False).groupby("Diet_type").head(5).reset_index(drop=True)
-    return top_protein
+def clean_data(data: pd.DataFrame) -> pd.DataFrame:
+    """
+    Clean dataset by removing rows with missing macronutrient or diet type values.
+    
+    Args:
+        data (pd.DataFrame): Input dataset with columns: Protein, Carbs, Fat, Diet_type.
+    
+    Returns:
+        pd.DataFrame: Cleaned dataset without null values in key columns.
+    """
+    return data.dropna(subset=["Protein", "Carbs", "Fat", "Diet_type"])
 
-# Identifying the diet type with the highest average protein content
-def diet_with_most_protein(data):
-    """Identify the diet type with the highest average protein content."""
+
+def avg_macros_by_diet(data: pd.DataFrame) -> pd.DataFrame:
+    """
+    Calculate average macronutrients grouped by diet type.
+    
+    Args:
+        data (pd.DataFrame): Input dataset with columns: Diet_type, Protein, Carbs, Fat.
+    
+    Returns:
+        pd.DataFrame: Average macros per diet type with columns:
+                     [Diet_type, Protein, Carbs, Fat]
+    """
+    return (
+        data.groupby("Diet_type")[["Protein", "Carbs", "Fat"]]
+        .mean()
+        .round(2)
+        .reset_index()
+    )
+
+
+def top_5_protein_by_diet(data: pd.DataFrame) -> pd.DataFrame:
+    """
+    Get top 5 recipes with highest protein content per diet type.
+    
+    Args:
+        data (pd.DataFrame): Input dataset with columns: Recipe_name, Diet_type, Cuisine, Protein.
+    
+    Returns:
+        pd.DataFrame: Top 5 high-protein recipes per diet type, sorted by protein descending.
+    """
+    return (
+        data.sort_values(by="Protein", ascending=False)
+        .groupby("Diet_type")
+        .head(5)
+        .reset_index(drop=True)
+    )
+
+
+def diet_with_most_protein(data: pd.DataFrame) -> tuple:
+    """
+    Identify which diet type has the highest average protein content.
+    
+    Args:
+        data (pd.DataFrame): Input dataset with columns: Diet_type, Protein.
+    
+    Returns:
+        tuple: (diet_type_name: str, avg_protein_value: float)
+    """
     avg_protein = data.groupby("Diet_type")["Protein"].mean()
     top_diet = avg_protein.idxmax()
-    return top_diet, avg_protein[top_diet]
+    return top_diet, round(avg_protein[top_diet], 2)
 
 
-def most_common_cuisine_by_diet(data):
-    """Identify the most common cuisine type for each diet type."""
-    common_cuisine = data.groupby("Diet_type")["Cuisine"].agg(lambda x: x.mode()[0] if not x.mode().empty else "Unknown").reset_index()
+def most_common_cuisine_by_diet(data: pd.DataFrame) -> pd.DataFrame:
+    """
+    Identify the most common cuisine type for each diet type.
+    
+    Args:
+        data (pd.DataFrame): Input dataset with columns: Diet_type, Cuisine.
+    
+    Returns:
+        pd.DataFrame: Most common cuisine per diet type with columns:
+                     [Diet_type, Cuisine]
+    """
+    common_cuisine = (
+        data.groupby("Diet_type")["Cuisine"]
+        .agg(lambda x: x.mode()[0] if not x.mode().empty else "Unknown")
+        .reset_index()
+    )
+    common_cuisine.columns = ["Diet_type", "Cuisine"]
     return common_cuisine
