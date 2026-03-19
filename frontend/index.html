@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,11 +8,17 @@
   <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
   <h1>Diet Analysis Dashboard</h1>
 
   <div class="controls">
     <button id="refreshBtn">Refresh Data</button>
+
+    <select id="dietFilter">
+      <option value="all">All Diet Types</option>
+    </select>
+
     <p id="meta">Execution time: --</p>
   </div>
 
@@ -29,4 +36,5 @@
 
   <script src="app.js"></script>
 </body>
+
 </html>
