@@ -14,6 +14,8 @@ def diet_dashboard(req: func.HttpRequest) -> func.HttpResponse:
 
     try:
         connection_string = os.getenv("BLOB_CONNECTION_STRING")
+        if not connection_string:
+            raise ValueError("BLOB_CONNECTION_STRING is not set")
         container_name = os.getenv("BLOB_CONTAINER_NAME", "datasets")
         blob_name = os.getenv("BLOB_FILE_NAME", "All_Diets.csv")
 
